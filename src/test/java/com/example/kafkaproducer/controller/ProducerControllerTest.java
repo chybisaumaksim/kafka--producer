@@ -39,12 +39,12 @@ class ProducerControllerTest {
         client.setClientId(1L);
         client.setEmail("someMail@gmail.com");
 
-        mockMvc.perform(post("/create/client").contentType(APPLICATION_JSON_VALUE)
+        mockMvc.perform(post("/client").contentType(APPLICATION_JSON_VALUE)
                         .content(objectMapper.writeValueAsString(client)))
                 .andExpect(status().isOk());
 
         verify(kafkaTemplate).send("client-topic", client.getClientId()
-                .toString(), client);
+                .toString(), objectMapper.writeValueAsString(client));
     }
 
     @Test
@@ -58,11 +58,11 @@ class ProducerControllerTest {
                 .quantity(10)
                 .build();
 
-        mockMvc.perform(post("/create/transaction").contentType(APPLICATION_JSON_VALUE)
+        mockMvc.perform(post("/transaction").contentType(APPLICATION_JSON_VALUE)
                         .content(objectMapper.writeValueAsString(transaction)))
                 .andExpect(status().isOk());
 
         verify(kafkaTemplate).send("transaction-topic", transaction.getClientId()
-                .toString(), transaction);
+                .toString(), objectMapper.writeValueAsString(transaction));
     }
 }

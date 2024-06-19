@@ -6,7 +6,7 @@ COPY pom.xml .
 RUN mvn dependency:go-offline
 
 COPY src ./src
-RUN mvn install -DskipTests
+RUN mvn clean install -DskipTests
 
 FROM openjdk:17-jdk-slim
 
