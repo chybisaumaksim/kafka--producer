@@ -1,6 +1,7 @@
 package com.example.kafkaproducer.controller;
 
 import com.example.kafkaproducer.dto.Client;
+import com.example.kafkaproducer.dto.ProducerResponse;
 import com.example.kafkaproducer.dto.Transaction;
 import com.example.kafkaproducer.dto.TransactionType;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -18,6 +19,7 @@ import java.time.LocalDateTime;
 import static org.mockito.Mockito.verify;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
@@ -38,9 +40,11 @@ class ProducerControllerTest {
         var client = new Client();
         client.setClientId(1L);
         client.setEmail("someMail@gmail.com");
+        var expectedResponse = new ProducerResponse("Client created successfully");
 
         mockMvc.perform(post("/client").contentType(APPLICATION_JSON_VALUE)
                         .content(objectMapper.writeValueAsString(client)))
+                .andExpect(content().json(objectMapper.writeValueAsString(expectedResponse)))
                 .andExpect(status().isOk());
 
         verify(kafkaTemplate).send("client-topic", client.getClientId()
@@ -58,8 +62,11 @@ class ProducerControllerTest {
                 .quantity(10)
                 .build();
 
+        var expectedResponse = new ProducerResponse("Transaction created successfully");
+
         mockMvc.perform(post("/transaction").contentType(APPLICATION_JSON_VALUE)
                         .content(objectMapper.writeValueAsString(transaction)))
+                .andExpect(content().json(objectMapper.writeValueAsString(expectedResponse)))
                 .andExpect(status().isOk());
 
         verify(kafkaTemplate).send("transaction-topic", transaction.getClientId()
